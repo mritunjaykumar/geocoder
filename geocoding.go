@@ -47,7 +47,7 @@ func Geocode(address string) (float64, float64, error) {
 
 	var lat float64
 	var lng float64
-	if len(result.Results[0].Locations) > 0 {
+	if len(result.Results) > 0 && len(result.Results[0].Locations) > 0 {
 		lat = result.Results[0].Locations[0].LatLng.Lat
 		lng = result.Results[0].Locations[0].LatLng.Lng
 	}
@@ -80,6 +80,10 @@ func FullGeocode(address string) (*GeocodingResult, error) {
 
 // Returns the address for a latitude and longitude.
 func ReverseGeocode(lat float64, lng float64) (*Location, error) {
+	if lat == 0 || lng == 0 {
+		return nil, fmt.Errorf("invalid lat or long value. lat:<%v>; long:<%v>", lat, lng)
+	}
+
 	// Query Provider
 	resp, err := http.Get(reverseGeocodeURL +
 		fmt.Sprintf("%f,%f&key=%s", lat, lng, apiKey))
@@ -101,7 +105,7 @@ func ReverseGeocode(lat float64, lng float64) (*Location, error) {
 	var location Location
 
 	// Assign the results to the Location struct
-	if len(result.Results[0].Locations) > 0 {
+	if len(result.Results) > 0 && len(result.Results[0].Locations) > 0 {
 		location = result.Results[0].Locations[0]
 	}
 
